@@ -124,3 +124,5 @@ Hinze's last version of moessner:
 >        s  = fromInteger $ List.sum x'
 >        n = length x'
 >        lrsum = scanl (+) 0
+
+This line is just a test.
