@@ -47,7 +47,8 @@ We now define some useful functions on streams.
 > head (Cons a t) = a
 > tail (Cons a t) = t
 > repeat a = Cons a (repeat a)
-> map f s = Cons (f (head s)) (tail s)
+ map f s = Cons (f (head s)) (tail s)
+> map f s = Cons (f (head s)) (map f (tail s))
 > zip f s t = Cons (f (head s) (head t)) (zip f (tail s) (tail t))
 > interleave (s:x) = Cons (head s) (interleave (x ++ [tail s]))
 
@@ -124,3 +125,23 @@ Hinze's last version of moessner:
 >        s  = fromInteger $ List.sum x'
 >        n = length x'
 >        lrsum = scanl (+) 0
+
+The Stream functor induces a monadic applicative functor
+
+> instance Applicative Stream where
+>	pure x = xs where xs = Cons x xs --(repeat)
+>	(Cons f fs) <*> (Cons x xs) = Cons (f x) (fs <*> xs) --(map)
+	
+> instance Functor Stream where
+>	fmap f (Cons x xs) = Cons (f x) (fmap f xs)
+
+Traversal involves iterating over the elements of a stream
+, in the style of a `map', but interpreting certain function 
+applications idiomatically. Note the similarity to |fmap|.
+
+> instance Traversable Stream where
+>	traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs
+	
+> instance Foldable Stream where
+>	fold xs = mconcat (to_list xs)
+	
