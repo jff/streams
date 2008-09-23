@@ -125,4 +125,3 @@ Hinze's last version of moessner:
 >        n = length x'
 >        lrsum = scanl (+) 0
 
-This line is just a test.
