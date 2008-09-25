@@ -126,6 +126,7 @@ Hinze's last version of moessner:
 >        n = length x'
 >        lrsum = scanl (+) 0
 
+<<<<<<< HEAD:Streams.lhs
 The Stream functor induces a monadic applicative functor
 
 > instance Applicative Stream where
@@ -145,3 +146,5 @@ applications idiomatically. Note the similarity to |fmap|.
 > instance Foldable Stream where
 >	fold xs = mconcat (to_list xs)
 	
+=======
+>>>>>>> 8c18b4223804dd5cf523b7d16f3e7f0f8ca9d4df:Streams.lhs
