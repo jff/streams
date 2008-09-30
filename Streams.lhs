@@ -13,6 +13,9 @@ This module defines a datatype Stream and useful functions on Streams.
 >                )
 
 > import qualified Data.List as List 
+> import Control.Applicative
+> --import Data.Traversable
+> --import Data.Foldable hiding (sum, foldr)
 
 > data Stream a  = Cons a (Stream a) 
 
@@ -47,7 +50,9 @@ We now define some useful functions on streams.
 > head (Cons a t) = a
 > tail (Cons a t) = t
 > repeat a = Cons a (repeat a)
- map f s = Cons (f (head s)) (tail s)
+
+map f s = Cons (f (head s)) (tail s)
+
 > map f s = Cons (f (head s)) (map f (tail s))
 > zip f s t = Cons (f (head s) (head t)) (zip f (tail s) (tail t))
 > interleave (s:x) = Cons (head s) (interleave (x ++ [tail s]))
@@ -126,7 +131,6 @@ Hinze's last version of moessner:
 >        n = length x'
 >        lrsum = scanl (+) 0
 
-<<<<<<< HEAD:Streams.lhs
 The Stream functor induces a monadic applicative functor
 
 > instance Applicative Stream where
@@ -140,11 +144,9 @@ Traversal involves iterating over the elements of a stream
 , in the style of a `map', but interpreting certain function 
 applications idiomatically. Note the similarity to |fmap|.
 
-> instance Traversable Stream where
->	traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs
+> --instance Traversable Stream where
+>	--traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs
 	
-> instance Foldable Stream where
->	fold xs = mconcat (to_list xs)
+> --instance Foldable Stream where
+>	--fold xs = mconcat (to_list xs)
 	
-=======
->>>>>>> 8c18b4223804dd5cf523b7d16f3e7f0f8ca9d4df:Streams.lhs
