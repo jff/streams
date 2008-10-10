@@ -14,8 +14,8 @@ This module defines a datatype Stream and useful functions on Streams.
 
 > import qualified Data.List as List 
 > import Control.Applicative
-> --import Data.Traversable
-> --import Data.Foldable hiding (sum, foldr)
+> import Data.Traversable
+> import Data.Foldable hiding (sum, foldr)
 
 > data Stream a  = Cons a (Stream a) 
 
@@ -93,9 +93,9 @@ Traversal involves iterating over the elements of a stream
 , in the style of a `map', but interpreting certain function
 applications idiomatically. Note the similarity to |fmap|.
 
-> --instance Traversable Stream where
->   --traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs
+> instance Traversable Stream where
+>   traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs
 
-> --instance Foldable Stream where
->   --fold xs = mconcat (to_list xs)
+> instance Foldable Stream where
+>   foldMap = foldMapDefault
 
