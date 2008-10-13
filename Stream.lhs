@@ -23,7 +23,9 @@ For Eq and Show instances, we only consider the first |ntoshow| elements of the 
 
 > ntoshow = 30
 
-Instances:
+Instances: 
+
+First, we want to manipulate streams of numbers as if they were numbers.
 
 > instance (Num a) => Num (Stream a) where
 >	(+) = zip (+)
@@ -33,10 +35,14 @@ Instances:
 >	abs = map abs
 >	signum = map signum
 
+We show the first |ntoshow| elements using a list notation.
+
 > instance (Show a) => Show (Stream a) where
 >	show s = "[" ++ limited_show ntoshow s
 >	 where  limited_show 1 (Cons h t)          = show h ++ "]"
 >       	limited_show n (Cons h t) = show h ++ "," ++ limited_show (n-1) t
+
+And we want to compare the first |ntoshow| elements of two streams.
 
 > instance (Eq a) => Eq (Stream a) where
 >	s == t = eqStream ntoshow s t
@@ -45,20 +51,26 @@ Instances:
 
 
 
-We now define some useful functions on streams.
+Now, we define some useful functions on streams.
 
+> head :: Stream a -> a
 > head (Cons a t) = a
+
+> tail :: Stream a -> Stream a
 > tail (Cons a t) = t
+
+> repeat :: a -> Stream a
 > repeat a = Cons a (repeat a)
 
-map f s = Cons (f (head s)) (tail s)
+> map :: (a -> b) -> Stream a -> Stream b
+> --map f s = Cons (f (head s)) (map f (tail s))
+> map = fmap
 
-> map f s = Cons (f (head s)) (map f (tail s))
+> zip :: (a -> b -> c) -> Stream a -> Stream b -> Stream c
 > zip f s t = Cons (f (head s) (head t)) (zip f (tail s) (tail t))
-> interleave (s:x) = Cons (head s) (interleave (x ++ [tail s]))
 
-> psum s = t where t = Cons 0 (t+s)
-> psum' = tail . psum
+> interleave :: [Stream a] -> Stream a
+> interleave (s:x) = Cons (head s) (interleave (x ++ [tail s]))
 
 Functions take and drop may be useful:
 
@@ -70,13 +82,24 @@ Functions take and drop may be useful:
 > drop 0 s = s
 > drop n (Cons a t) = drop (n-1) t
 
+
+
+
+The following functions are useful for dealing with streams of numbers.
+
+> psum :: (Num a) => Stream a -> Stream a
+> psum s = t where t = Cons 0 (t+s)
+
+> psum' :: (Num a) => Stream a -> Stream a        
+> psum' = tail . psum
+
 Auxiliary functions on lists:
 
 > lsum :: (Num a) => [Stream a] -> [Stream a]
 > lsum = scanl (+) 0
+
 > lsum' :: (Num a) => [Stream a] -> [Stream a]
 > lsum' = List.tail . lsum
-
 
 
 
