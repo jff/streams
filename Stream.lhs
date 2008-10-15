@@ -110,7 +110,7 @@ The Stream functor induces a monadic applicative functor
 >   (Cons f fs) <*> (Cons x xs) = Cons (f x) (fs <*> xs) --(map)
 
 > instance Functor Stream where
->   fmap f (Cons x xs) = Cons (f x) (fmap f xs)
+>   fmap f = (pure f <*>)
 
 Traversal involves iterating over the elements of a stream
 , in the style of a `map', but interpreting certain function
