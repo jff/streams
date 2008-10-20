@@ -118,12 +118,6 @@ applications idiomatically. Note the similarity to |fmap|.
 
 > instance Traversable Stream where
 >	traverse f (Cons x xs) = pure Cons <*> f x <*> traverse f xs --traverse f = sequenceA . fmap f
-
-disperse is a traversal that modifies elements effectfully but dependent on the state,
-evolving the state indepenently of the elements.
-
-> disperse :: (Traversable t, Applicative m) => m b -> (a -> b -> c) -> t a -> m (t c)
-> disperse mb g = traverse (\a -> pure (g a) <*> mb)
 	
 > instance Foldable Stream where
 >   foldMap = foldMapDefault

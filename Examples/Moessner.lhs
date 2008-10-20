@@ -2,6 +2,10 @@
 > import Stream
 > import qualified Data.List as List 
 
+> import Control.Applicative
+> import Control.Monad.State.Lazy
+> import Data.Traversable
+
 Ralf's moessner definition:
 
 > moessner :: (Num a) => [Stream a] -> Stream a
@@ -50,3 +54,12 @@ Hinze's last version of moessner:
 >        n = length x'
 >        lrsum = scanl (+) 0
 
+Eric's attempt at Moessner:
+
+> type M m a = WrappedMonad m a
+
+disperse is a traversal that modifies elements effectfully but dependent on the state,
+evolving the state indepenently of the elements.
+
+> disperse :: (Traversable t, Applicative m) => m b -> (a -> b -> c) -> t a -> m (t c)
+> disperse mb g = traverse (\a -> pure (g a) <*> mb)
