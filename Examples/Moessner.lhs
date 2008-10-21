@@ -56,10 +56,21 @@ Hinze's last version of moessner:
 
 Eric's attempt at Moessner:
 
+-- ?remove :: State (Integer, (Stream (Maybe Integer)))
+
+> remove :: Stream Integer -> M (State Integer) (Stream (Maybe Integer))
+> remove = disperse (WrapMonad step) sift
+
+> step :: State Integer Integer
+> step = do{ n <- get; put (n+1); return n}
+
+> sift :: Integer -> Integer -> Maybe Integer
+> sift k n = if k `mod` n == 0 then Nothing else Just k
+
 > type M m a = WrappedMonad m a
 
 disperse is a traversal that modifies elements effectfully but dependent on the state,
-evolving the state indepenently of the elements.
+evolving the state independently of the elements.
 
 > disperse :: (Traversable t, Applicative m) => m b -> (a -> b -> c) -> t a -> m (t c)
 > disperse mb g = traverse (\a -> pure (g a) <*> mb)
