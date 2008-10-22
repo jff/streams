@@ -56,16 +56,29 @@ Hinze's last version of moessner:
 
 Eric's attempt at Moessner:
 
+Delete every n-th element.
+
 -- ?remove :: State (Integer, (Stream (Maybe Integer)))
 
-> remove :: Stream Integer -> M (State Integer) (Stream (Maybe Integer))
-> remove = disperse (WrapMonad step) sift
+> remove :: Integer -> Stream Integer -> M (State Integer) (Stream (Maybe Integer))
+> remove nth = disperse (WrapMonad step) (sift nth)
+
+Stream elements are numbered starting from 1.
 
 > step :: State Integer Integer
-> step = do{ n <- get; put (n+1); return n}
+> step = do{ i <- get; put (i+1); return i}
 
-> sift :: Integer -> Integer -> Maybe Integer
-> sift k n = if k `mod` n == 0 then Nothing else Just k
+> sift :: Integer -> Integer -> Integer -> Maybe Integer
+> sift n k i = if i `mod` n == 0 then Nothing else Just k
+
+Replace remaining elements by partial sums.
+
+> partial_sum :: Stream (Maybe Integer) -> M(State Integer)(Stream (Maybe Integer))
+> partial_sum = traverse step'
+
+> step' :: Maybe Integer ->  M (State Integer) (Maybe Integer)
+> step' Nothing = WrapMonad $ return Nothing
+> step' (Just k) = WrapMonad $ do { i<- get; put (i+k); return (Just (i+k))}
 
 > type M m a = WrappedMonad m a
 
