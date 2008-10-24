@@ -56,31 +56,50 @@ Hinze's last version of moessner:
 
 Eric's attempt at Moessner:
 
-Delete every n-th element.
+> type M m a = WrappedMonad m a
 
--- ?remove :: State (Integer, (Stream (Maybe Integer)))
+> type Space = (Integer, Integer)
 
-> remove :: Integer -> Stream Integer -> M (State Integer) (Stream (Maybe Integer))
-> remove nth = disperse (WrapMonad step) (sift nth)
+> nat = Cons 0 (nat+1)
+> pos_nat = nat + 1
+> nat' = fmap Just pos_nat
 
-Stream elements are numbered starting from 1.
+> moessnerE :: Integer -> M (State Space) (Stream(Maybe Integer))
+> moessnerE n = moessnerE' n nat'
 
-> step :: State Integer Integer
-> step = do{ i <- get; put (i+1); return i}
+> moessnerE' :: Integer -> Stream(Maybe Integer) -> M (State Space) (Stream(Maybe Integer)) -- State {i,s : Integer}
+> moessnerE' n xs = 
+>	case n of
+>		0 -> pure ones where ones = Cons (Just 1) ones
+>		1 -> pure xs 
+>		otherwise ->
+>			let 
+>				mst = unwrapMonad (remove n xs)
+>				xs' = fst (runState mst (0,0))
+>				mg = unwrapMonad (partial_sum xs')
+>				ys = fst (runState mg (0,0))
+>		 	in moessnerE' (n-1) ys
 
-> sift :: Integer -> Integer -> Integer -> Maybe Integer
-> sift n k i = if i `mod` n == 0 then Nothing else Just k
+Delete every n-th element. Stream elements are numbered starting from 1.
+
+> remove :: Integer -> Stream (Maybe Integer) -> M (State Space) (Stream (Maybe Integer))
+> remove nth = disperse (WrapMonad step) (sift nth) --if nth == 1 then WrapMonad . return 
+
+> step :: State Space Integer
+> step = do{ (i, s) <- get; put (i+1, s); return i}
+
+> sift :: Integer -> Maybe Integer -> Integer -> Maybe Integer
+> sift n (Just k) i = if i `mod` n == 0 then Nothing else Just k
 
 Replace remaining elements by partial sums.
 
-> partial_sum :: Stream (Maybe Integer) -> M(State Integer)(Stream (Maybe Integer))
+> partial_sum :: Stream (Maybe Integer) -> M(State Space)(Stream (Maybe Integer))
 > partial_sum = traverse step'
 
-> step' :: Maybe Integer ->  M (State Integer) (Maybe Integer)
+> step' :: Maybe Integer ->  M (State Space) (Maybe Integer)
 > step' Nothing = WrapMonad $ return Nothing
-> step' (Just k) = WrapMonad $ do { i<- get; put (i+k); return (Just (i+k))}
+> step' (Just k) = WrapMonad $ do { (i,s) <- get; put (i, s+k); return (Just (s+k))}
 
-> type M m a = WrappedMonad m a
 
 disperse is a traversal that modifies elements effectfully but dependent on the state,
 evolving the state independently of the elements.
